@@ -1,7 +1,8 @@
 #!/bin/bash
 
+path="/home/Denis/Desktop/project_ITBI"
+
 run_shell() {
-	path="/home/Denis/Desktop/project_ITBI"
 	last_path="$path"
 	path_montare="$path/mountplace/"
 	while true; do
@@ -21,16 +22,15 @@ run_shell() {
                                 	echo "exista"
 					gasit="0"
 					echo "$gasit"
-					mount_cnt=1
 					while IFS=' ' read -r word0 word1 _; do
                                			 if [[ "$path/${command#cd }" == *"$word0"* ]]; then
 							mount_path="$word0"
 							gasit="1"
 							break
                                			 fi
-						let mount_cnt=mount_cnt+1
                         		done < /home/Denis/Desktop/project_ITBI/mountpoints 
 					path="$path/${command#cd }"
+					cd "$path"
 					if [[ "$gasit" == "1" ]]; then
                               			 echo "mountpoint"
 						mount_info= $(mount | grep "$path")
@@ -38,14 +38,24 @@ run_shell() {
 							echo "montat"
 						else
 							echo "nemontat"
-							cd "/home/Denis/Desktop/project_ITBI"
-							cd "mountplace"
-							mkdir -p "mounted_$mount_cnt"
-							sudo mount "$path" "/home/Denis/Desktop/project_ITBI/mountplace/mounted_$mount_cnt" && echo "Montare reusita" || echo "Eroare"
+							reusita=0
+							sudo mount --bind "$path" "$path" && mount; echo "Montare reusita"; reusita=1 || echo "Eroare"
+							if [[ "$reusita" == 1 ]]; then
+								procese="1"
+								while [[ "$procese" == "1" ]]; do
+									sleep "$word1"
+									fuser -v "$path" > /dev/null	
+									if [[ $? -eq 1 ]]; then
+										sudo umount "$path"
+										echo "Unmounted"
+										mount
+										procese="0"
+									fi
+								done
+							fi
+
 						fi
-						# gestionam situatia in care este mountpoint
                        			else
-                         			cd "$path"
                        				echo "nu este mountpoint" 
 					fi
 				 else
@@ -58,6 +68,17 @@ run_shell() {
 			sh -c "$command"
 		fi
 	done
+}
+
+timer() {
+	fuser -v "$path" > /dev/null    
+	if [[ $? -eq 1 ]]; then
+		sudo umount "$path"
+        	echo "Unmounted"
+        	mount
+        	procese="0"
+	fi
+
 }
 
 run_shell

@@ -43,14 +43,16 @@ run_shell() {
 							if [[ "$reusita" == 1 ]]; then
 								procese="1"
 								while [[ "$procese" == "1" ]]; do
-									sleep "$word1"
-									fuser -v "$path" > /dev/null	
-									if [[ $? -eq 1 ]]; then
-										sudo umount "$path"
-										echo "Unmounted"
-										mount
-										procese="0"
-									fi
+									while sleep "$word1"; do
+										fuser -v "$path" > /dev/null
+										if [[ $? -eq 1 ]]; then
+											sudo umount "$path"
+											echo "Unmounted"
+											mount
+											procese="0"
+											break
+										fi
+									done
 								done
 							fi
 
@@ -68,17 +70,6 @@ run_shell() {
 			sh -c "$command"
 		fi
 	done
-}
-
-timer() {
-	fuser -v "$path" > /dev/null    
-	if [[ $? -eq 1 ]]; then
-		sudo umount "$path"
-        	echo "Unmounted"
-        	mount
-        	procese="0"
-	fi
-
 }
 
 run_shell

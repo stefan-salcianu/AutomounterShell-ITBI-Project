@@ -2,9 +2,13 @@
 
 path="/home/stefan/Documents/lab_itbi/AutomounterShell-ITBI-Project"
 
+proces(){
+ fuser -v "$1" > /dev/null
+ sleep "$2" && [[ $? -eq 1 ]] && sudo umount "$1" && echo "$1" &&  echo "Unmounted successfully" && mount || proces "$1" "$2" &
+}
+
 run_shell() {
 	last_path="$path"
-	path_montare="$path/mountplace/"
 	while true; do
 		echo -n "ashm> "
 		read -r command
@@ -41,19 +45,9 @@ run_shell() {
 							reusita=0
 							sudo mount --bind "$path" "$path" && mount; echo "Montare reusita"; reusita=1 || echo "Eroare"
 							if [[ "$reusita" == 1 ]]; then
-								procese="1"
-								while [[ "$procese" == "1" ]]; do
-									while sleep "$word1"; do
-										fuser -v "$path" > /dev/null
-										if [[ $? -eq 1 ]]; then
-											sudo umount "$path"
-											echo "Unmounted"
-											mount
-											procese="0"
-											break
-										fi
-									done
-								done
+								#~/Documents/lab_itbi/AutomounterShell-ITBI-Project/proces.sh "$path" "$word1" &
+								proces "$path" "$word1"
+
 							fi
 
 						fi

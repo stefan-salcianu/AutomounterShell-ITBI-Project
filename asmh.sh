@@ -1,6 +1,6 @@
 #!/bin/bash
 
-path="/home/Denis/Desktop/project_ITBI"
+path="/home/stefan/Documents/lab_itbi/AutomounterShell-ITBI-Project"
 
 run_shell() {
 	last_path="$path"
@@ -28,7 +28,7 @@ run_shell() {
 							gasit="1"
 							break
                                			 fi
-                        		done < /home/Denis/Desktop/project_ITBI/mountpoints 
+                        		done < /home/stefan/Documents/lab_itbi/AutomounterShell-ITBI-Project/mountpoints
 					path="$path/${command#cd }"
 					cd "$path"
 					if [[ "$gasit" == "1" ]]; then
